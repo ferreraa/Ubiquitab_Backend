@@ -1,18 +1,32 @@
-import * as sns from '@aws-cdk/aws-sns';
-import * as subs from '@aws-cdk/aws-sns-subscriptions';
-import * as sqs from '@aws-cdk/aws-sqs';
 import * as cdk from '@aws-cdk/core';
+import * as lambda from '@aws-cdk/aws-lambda';
+import * as apigw from '@aws-cdk/aws-apigateway';
+import { LambdaIntegration } from '@aws-cdk/aws-apigateway';
 
 export class LoginStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const queue = new sqs.Queue(this, 'LoginQueue', {
-      visibilityTimeout: cdk.Duration.seconds(300)
+    const getRegisterHandler = new lambda.Function(this, 'registerHandler', {
+      runtime: lambda.Runtime.NODEJS_14_X,
+      code: lambda.Code.fromAsset('lambda/register'),
+      handler: 'register.handler'
     });
 
-    const topic = new sns.Topic(this, 'LoginTopic');
+    const getLoginHandler = new lambda.Function(this, 'loginHandler', {
+      runtime: lambda.Runtime.NODEJS_14_X,
+      code: lambda.Code.fromAsset('lambda/login'),
+      handler: 'login.handler'
+    });
 
-    topic.addSubscription(new subs.SqsSubscription(queue));
-  }
+    const api = new apigw.RestApi(this, 'ubiquitab-api', { });
+    api.root.addMethod('ANY');
+
+    const register = api.root.addResource('register');
+    register.addMethod('POST', new LambdaIntegration(getRegisterHandler));
+
+    const login = api.root.addResource('login');
+    login.addMethod('POST', new LambdaIntegration(getLoginHandler));
+
+   }
 }
