@@ -11,6 +11,12 @@ export class LoginStack extends cdk.Stack {
     const usersTable = new dynamodb.Table(this, 'Users', {
       partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      sortKey: { name: 'email', type: dynamodb.AttributeType.STRING },
+    });
+
+    usersTable.addGlobalSecondaryIndex({
+      indexName: 'email-index',
+      partitionKey: { name: 'email', type: dynamodb.AttributeType.STRING },
     });
 
     const getRegisterHandler = new lambda.Function(this, 'registerHandler', {
