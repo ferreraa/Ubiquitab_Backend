@@ -28,6 +28,8 @@ export class LoginStack extends cdk.Stack {
       }
     });
 
+    usersTable.grantReadWriteData(getRegisterHandler);
+
     const getLoginHandler = new lambda.Function(this, 'loginHandler', {
       runtime: lambda.Runtime.NODEJS_14_X,
       code: lambda.Code.fromAsset('lambda/login'),
