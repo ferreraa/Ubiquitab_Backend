@@ -39,6 +39,8 @@ export class LoginStack extends cdk.Stack {
       }
     });
 
+    usersTable.grantReadData(getLoginHandler);
+
     const api = new apigw.RestApi(this, 'ubiquitab-api', { });
     api.root.addMethod('ANY');
 
