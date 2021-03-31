@@ -1,12 +1,14 @@
 import { 
-    APIGatewayProxyEvent, 
-    APIGatewayProxyResult,
-    APIGatewayProxyEventQueryStringParameters
-  } from 'aws-lambda';
+  APIGatewayProxyEvent, 
+  APIGatewayProxyResult,
+  APIGatewayProxyEventQueryStringParameters
+} from 'aws-lambda';
 import { validate } from 'email-validator';
 import * as DB from 'ubiquitab_db';
 import { v4 as uuidv4 } from 'uuid';
 import * as bcrypt from 'bcrypt';
+
+DB.config(process.env.usersTableName!, {})
 
 export const handler = async (
   event: APIGatewayProxyEvent
@@ -21,7 +23,6 @@ export const handler = async (
     }
   }
 
-  DB.config(process.env.usersTableName!, {})
 
   try {
     let id = uuidv4();
